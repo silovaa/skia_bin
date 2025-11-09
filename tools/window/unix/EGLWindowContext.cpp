@@ -1,15 +1,14 @@
-#include "skia_context.h"
+#include "tools/window/unix/EGLWindowContext.h"
 
 //for NativeWindowType
 #define WL_EGL_PLATFORM
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+#include <wayland-egl-core.h>
 
 #include "tools/window/GLWindowContext.h"
 #include "include/gpu/ganesh/gl/GrGLAssembleInterface.h"
 #include "src/gpu/ganesh/gl/GrGLDefines.h"
-
-#include "wayland-egl-core.h"
 
 using skwindow::DisplayParams;
 using skwindow::internal::GLWindowContext;
