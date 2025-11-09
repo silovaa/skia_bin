@@ -92,6 +92,7 @@ elseif (UNIX)
     set(SKIA_TOOLS_SOURCE 
         ${CMAKE_CURRENT_LIST_DIR}/tools/window/GLWindowContext.cpp
         ${CMAKE_CURRENT_LIST_DIR}/tools/window/WindowContext.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/tools/window/unix/EGLWindowContext.cpp
       )
 
     if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -151,6 +152,12 @@ target_include_directories(Skia::skia INTERFACE
 if (WIN_TOOLS_REQURE)
   add_library(win_tools STATIC ${SKIA_TOOLS_SOURCE})
   add_library(Skia::win_tools ALIAS win_tools)
+
+  if (${PLATFORM} STREQUAL egl)
+    pkg_check_modules(WEGL REQUIRED IMPORTED_TARGET wayland-egl)
+    target_link_libraries(win_tools PRIVATE PkgConfig::WEGL)
+  endif()
+
   target_link_libraries(win_tools PRIVATE Skia::skia)
   target_include_directories(win_tools PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src 
                                               ${CMAKE_CURRENT_LIST_DIR}/tools
