@@ -58,6 +58,8 @@ void EGLWindowContext_wayland::resize(int w, int h)
 {
     wl_egl_window_resize(m_native, w, h, 0, 0);
     fSurface.reset(nullptr);
+    fWidth = w;
+    fHeight = h;
 }
 
 sk_sp<const GrGLInterface> EGLWindowContext_wayland::onInitializeContext() {
