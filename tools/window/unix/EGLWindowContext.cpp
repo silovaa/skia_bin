@@ -4,7 +4,7 @@
 #define WL_EGL_PLATFORM
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#include <wayland-egl-core.h>
+#include <wayland-egl.h>
 
 #include "tools/window/GLWindowContext.h"
 #include "include/gpu/ganesh/gl/GrGLAssembleInterface.h"
@@ -17,7 +17,7 @@ namespace {
 
 class EGLWindowContext_wayland : public GLWindowContext {
 public:
-    EGLWindowContext_wayland(void *dpy, wl_egl_window *native_win, std::unique_ptr<const DisplayParams>);
+    EGLWindowContext_wayland(void *dpy, wl_surface *surf, int w, int h, std::unique_ptr<const DisplayParams>);
     ~EGLWindowContext_wayland();
 
     void resize(int w, int h) override;
@@ -37,10 +37,14 @@ private:
     EGLSurface m_EGLSurface = EGL_NO_SURFACE;
 };
 
-EGLWindowContext_wayland::EGLWindowContext_wayland(void* dpy, wl_egl_window *native_win,
+EGLWindowContext_wayland::EGLWindowContext_wayland(void* dpy, wl_surface *surf, int w, int h,
                                                std::unique_ptr<const DisplayParams> params)
-    : GLWindowContext(std::move(params)), m_native(native_win), m_Display(dpy)
+    : GLWindowContext(std::move(params))
+    , m_native(wl_egl_window_create(surf, w, h))
+    , m_Display(dpy)
 {
+    fWidth = w;
+    fHeight = h;
     this->initializeContext();
 }
 
@@ -125,7 +129,7 @@ sk_sp<const GrGLInterface> EGLWindowContext_wayland::onInitializeContext() {
 
         eglGetConfigAttrib(m_Display, surfaceConfig, EGL_STENCIL_SIZE, &fStencilBits);
 
-        wl_egl_window_get_attached_size(m_native, &fWidth, &fHeight);
+        //wl_egl_window_get_attached_size(m_native, &fWidth, &fHeight);
 
         interface->fFunctions.fViewport(0, 0, fWidth, fHeight);
     }
@@ -156,12 +160,12 @@ void EGLWindowContext_wayland::onDestroyContext() {
 
 namespace skwindow {
 
-std::unique_ptr<WindowContext> MakeEGLForWayland(void *dpy, wl_egl_window *window,
+std::unique_ptr<WindowContext> MakeEGLForWayland(void *dpy, wl_surface *surf, int w, int h,
                                                  std::unique_ptr<const DisplayParams> params)
 {
     std::unique_ptr<WindowContext> ctx(new EGLWindowContext_wayland(
                                             dpy,
-                                            window,
+                                            surf, w, h,
                                             std::move(params)));
     if (!ctx->isValid()) {
         return nullptr;

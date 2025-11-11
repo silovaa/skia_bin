@@ -3,14 +3,14 @@
 
 #include <memory>
 
-class wl_egl_window;
+class wl_surface;
 
 namespace skwindow {
 
 class WindowContext;
 class DisplayParams;
 
-std::unique_ptr<WindowContext> MakeEGLForWayland(void *dpy, wl_egl_window *window,
+std::unique_ptr<WindowContext> MakeEGLForWayland(void *dpy, wl_surface *surf, int w, int h,
                                                  std::unique_ptr<const DisplayParams>);
 }  // namespace skwindow
 
